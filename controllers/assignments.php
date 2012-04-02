@@ -1,8 +1,13 @@
 <?php
-//require_once('libraries/Idiorm/idiorm.php');
-//require_once('libraries/Paris/paris.php');
 
+require_once('libraries/Idiorm/idiorm.php');
+require_once('libraries/Paris/paris.php');
 
+/**
+ * Assignment controller.
+ *
+ * @package Controllers
+ */
 class AssignmentController
 {
 	/**
@@ -16,7 +21,6 @@ class AssignmentController
 	 *
 	 *	@return the Assignment object if creation was successful, otherwise false
  	 */
-
 	static function createAssignment($section_id, $group_id, $owner_id, $collect_id, $name, $description)
 	{
 		$assignment = Model::factory('Assignment')->create();
