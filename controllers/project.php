@@ -1,31 +1,45 @@
 <?php
+
 require_once('libraries/Idiorm/idiorm.php');
 require_once('libraries/Paris/paris.php');
+require_once('libraries/constant.php');
+require_once('models/project.php');
 
-
+/**
+ * Controller handling Project objects
+ *
+ * @package Controllers
+ */
 class ProjectController
 {
 	/**
-	 *	Create a new Project object with the specified creator_id, name, abstract, description, and privacy.
-	 *		@param int creator_id is the ID of the user creating the project
-	 *		@param string name is the name of the project
+	 *	Create a new Project object with the specified creator_id, title, abstract, description, and privacy.
+	 *		@param int creator_user_id is the ID of the user creating the project
+	 *		@param string title is the title of the project
 	 *		@param string abstract is the abstract of the project
 	 *		@param string description is the description of the project
 	 *		@param bool privacy is the privacy of the project
 	 *
 	 *	@return the created Project object if successful, false otherwise.
 	 */
-	static function createProject($creator_id, $name, $abstract, $description, $privacy)
+	static function createProject($title, $description, $type, $privacy)
 	{
-		$project = Model::factory('Project')->create();
-		$project->creator_id = $creator_id;
-		$project->name = $name;
-		$project->abstract = $abstract;
+		// Check for creation privileges
+
+		if (!$project = Model::factory('Project')->create())
+		{
+			return false;
+		}
+
+		$project->creator_user_id = USER_ID;	// Check for calling USER ID
+		$project->title = $title;
 		$project->description = $description;
+		$project->type = $type;
 		$project->private = $privacy;
 
 		if (!$project->save())
 		{
+			$project->delete();
 			return false;
 		}
 
@@ -41,29 +55,23 @@ class ProjectController
 	 *
 	 *	@return true if the project was successfully edited, false otherwise
 	 */
-	static function editProject($id, $abstract, $description, $privacy)
+	static function editProject($id, $title, $description, $type, $privacy)
 	{
 		$project = self::getProject($id);
 
-		//if there was no project found with that ID
 		if (!$project)
 		{
 			return false;
 		}
 
-		if (!empty($abstract))
-		{
-			$project->abstract = $abstract;	
-		}
-		if (!empty($description))
-		{
-			$project->description = $description;
-		}
-		$project->privacy = $privacy;
+		// Check for editing permissions
 
-		$project->save();
+		if (!is_null($title))		{ $project->title = $title; }
+		if (!is_null($description))	{ $project->description = $description;	}
+		if (!is_null($type))		{ $project->type = $type; }
+		if (!is_null($privacy))		{ $project->privacy = $privacy; }
 
-		return true;
+		return $project->save();
 	}
 
 	/**
@@ -74,17 +82,39 @@ class ProjectController
 	 */
 	static function deleteProject($id)
 	{
-		$project = Model::factory('Project')->find_one($id);
+		$project = self::getProject($id);
 
-		//if we found a project with that ID
 		if (!$project)
 		{
 			return false;
 		}
 
-		$project->delete();
-		return true;
+		// Check for deletion permissions
+		
+		return $project->delete();
 	}
+
+	/**
+	 * Returns a Project for viewing by the caller.
+	 * Checks that caller has viewing permissions for the Project.
+	 * 		@param int id is the ID of the project to view.
+	 *
+	 * @return The Project object if successful, false otherwise.
+	 */
+	static function viewProject($id)
+	{
+		$project = self::getProject($id);
+		
+		if (!$project)
+		{
+			return false;
+		}
+
+		// Check for viewing permissions
+		
+		return $project;
+	}
+
 
 	/**
 	 * Retrieve a specific Project object.
@@ -92,7 +122,7 @@ class ProjectController
 	 *
 	 * @return the Project object requested if found, otherwise false
 	 */
-	static function getProject($id)
+	private static function getProject($id)
 	{
 		return Model::factory('Project')->find_one($id);
 	}

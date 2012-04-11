@@ -29,7 +29,7 @@ class Portfolio extends Model
 
 
 	/**
-	 * Magic-method property getters
+	 *	Magic-method property getters
 	 */
 	public function __get($name)
 	{
@@ -72,7 +72,7 @@ class Portfolio extends Model
 	}
 
 	/**
-	 * Magic-method property setters
+	 *	Magic-method property setters
 	 */
 	public function __set($name, $value)
 	{
@@ -95,33 +95,37 @@ class Portfolio extends Model
 	}
 
 	/**
-	 * Overridden delete function to handle the removal of all hanging dependencies on this Portfolio.
+	 *	Overridden delete function to handle the removal of all hanging dependencies on this Portfolio.
 	 */
 	public function delete()
 	{
 		// Remove all references to this Portfolio by Assignments
-		//$assignments = getAssignmentsForPortoflio($this->id());
-		$assignments = Model::factory('Assignment')
+		foreach ($assignments = Model::factory('Assignment')
 			->where('portfolio_id', $this->id())
-			->find_many();
-		foreach ($assignments as $assign)
+			->find_many() as $assign)
 		{
 			$assign->portfolio_id = NULL;
 			$assign->save();
 		}
 
-		// Remove all references to this Portfolio by Projects
-		$projects = Model::factory('PortfolioProjectMap')
+		// Remove all references to this Portfolio by Projects/sub-Portfolios/super-Portfolios
+		foreach ($projects = Model::factory('PortfolioProjectMap')
 			->where('port_id', $this->id())
-			->find_many();
-		foreach ($projects as $proj)
+			->find_many() as $proj)
 		{
 			$proj->delete();
 		}
+		foreach ($superPorts = Model::factory('PortfolioProjectMap')
+			->where('child_id', $this->id())
+			->find_many() as $port)
+		{
+			$port->delete();
+		}
 		
 		// Remove all Groups' permissions on this Portfolio
-		$groups = $this->groupsWithPermission();
-		foreach ($groups as $group=>$permissions)
+		//	(unfortunately, we cannot clean up Groups specifically made for this Portfolio easily,
+		//	thus they will remain and clutter the database.)
+		foreach ($groups = $this->groupsWithPermission() as $group=>$permissions)
 		{
 			foreach ($permissions as $perm)
 			{
@@ -134,13 +138,13 @@ class Portfolio extends Model
 			}
 		}
 
-		parent::delete();
+		return parent::delete();
 	}
 
 	/**
-	 * Retrieve all Groups with permissions for this Porfolio.
+	 *	Retrieve all Groups with permissions for this Porfolio.
 	 *
-	 * @return	array				An array of arrays with keys specifying the identifier of the Group,
+	 *	@return	array				An array of arrays with keys specifying the identifier of the Group,
 	 *								and the value for the key being an array of all permission levels
 	 *								of the Group for this Portfolio, as specified in 'constant.php'.
 	 */
@@ -166,11 +170,11 @@ class Portfolio extends Model
 	}
 
 	/**
-	 * Retrieve a Group's permissions for this Portfolio.
+	 *	Retrieve a Group's permissions for this Portfolio.
 	 *
-	 * @param	int		$group		The identifier of the Group object for which we seek the permissions of.
+	 *	@param	int		$group		The identifier of the Group object for which we seek the permissions of.
 	 *
-	 * @return	array				An array of permission levels as specified in 'constant.php', or an empty
+	 *	@return	array				An array of permission levels as specified in 'constant.php', or an empty
 	 * 								array in the event the Group has no permissions.
 	 */
 	public function permissionsForGroup($group)
@@ -189,15 +193,24 @@ class Portfolio extends Model
 	}
 
 	/**
-	 * Add a permission level for a Group in regards to this Portfolio.
+	 *	Add a permission level for a Group in regards to this Portfolio.
 	 *
-	 * @param	int		$group		The identifier of the Group objects we seek to add permissions to.
-	 * @param	int		$perm		The permission level as specified in 'constant.php' for the Group.
+	 *	@param	int		$group		The identifier of the Group objects we seek to add permissions to.
+	 *	@param	int		$perm		The permission level as specified in 'constant.php' for the Group.
 	 *
-	 * @return	bool				True if successful, false otherwise.
+	 *	@return	bool				True if successful, false otherwise.
 	 */
 	public function addPermissionForGroup($group, $perm)
 	{
+		if (Model::factory('PortfolioAccessMap')
+			->where('port_id', $this->id())
+			->where('group_id', $group)
+			->where('access_type', $perm)
+			->find_one())
+		{
+			return false;
+		}
+
 		if (!$map = Model::factory('PortfolioAccessMap')->create())
 		{
 			return false;
@@ -209,6 +222,40 @@ class Portfolio extends Model
 
 		return $map->save();
 	}
+
+	/**
+	 *	Remove a permission level for a Group in regards to this Portfolio.
+	 *
+	 *	@param	int		$group		The identifier of the Group objects we seek to remove permissions from.
+	 *	@param	int		$perm		The permission level as specified in 'constant.php' for the Group.
+	 *
+	 *	@return	bool				True if successful, false otherwise.
+	 */
+	public function removePermissionForGroup($group, $perm)
+	{
+		if (!$permissions = $this->permissionsForGroup($group))
+		{
+			return false;
+		}
+
+		foreach ($permissions as $p)
+		{
+			if ($p == $perm)
+			{
+				$permORM = Model::factory('PortfolioAccessMap')
+					->where('port_id', $this->id())
+					->where('group_id', $group)
+					->where('access_type', $perm)
+					->find_one();
+				return $permORM->delete();
+			}
+		}
+
+		return false;
+	}
+
+
+
 }
 
 ?>
