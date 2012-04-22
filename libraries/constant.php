@@ -5,28 +5,18 @@
  * @package Constants
  */
 
-/******************************************
- ****** TEST USER ID 				 ******
- ****** DEVELOPMENT ENVIRONMENT ONLY ******
- *****************************************/
-DEFINE("USER_ID", 2);
-
-
-/**
- * Global ID column overrides.
- */
-ORM::configure('id_column_overrides', array(
-	'REPO_Portfolios' => 'port_id',
-));
-
+//for testing purposes
+error_reporting(E_ALL);
 
 /**
  * Permission types.
  * Constant mapping of integer values to standard permission names.
+ * Permissions constitute a heirarchy, whereby each permission also grants all permissions
+ * below it (i.e. EDIT privilege also grants READ and SUBMIT to the User/Group)
  */
 /**
  * OWNER
- * Has overarching total permission of an object (read, write, edit, delete).
+ * Has overarching total permission of an object (including deletion).
  */
 DEFINE("OWNER",	1);
 /**
@@ -57,5 +47,23 @@ DEFINE("SUBMIT", 5);
  */
 DEFINE("ARTICLE", 1);
 DEFINE("GALLERY", 2);
+
+/**
+ *	Statuses of Portfolio children
+ */
+DEFINE("PUBLIC", 0);	// Child is fully viewable to Users with READ or higher privileges on the parent Portfolio
+DEFINE("PRIVATE", 1);	// Child is only viewable by Users with WRITE or higher permissions on the parent Portfolio
+DEFINE("SUBMITTED", 2);	// Child is awaiting approval from a submissions, and can be viewable by Users with WRITE 
+						//	or higher permissions on the parent Portfolio
+
+function arrayFlatten($array)
+{
+	$ret = array();
+	array_walk_recursive($array, function($value) use(&$ret) {
+		$ret[] = $value;
+	});
+
+	return $ret;
+}
 
 ?>

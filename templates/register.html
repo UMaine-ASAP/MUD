@@ -1,0 +1,35 @@
+{% extends 'layout.html' %}
+
+{% block page_title %}New Media Portfolio Login{% endblock %}
+
+{% block content %}
+
+	<ul class="menu sgray fade" id="menu">
+		<li><a href="{{ flash['web_root'] }}">New Media Portfolio 2012</a></li>
+	</ul>
+
+	<header>New Media Portfolio - Register</header>
+	
+	<hr>
+	
+	<div id="themed" class="loginForm">
+		
+		<form id="form" name="form" method="post" action="{{ flash['web_root'] }}/register">
+		
+		<label>Username</label>
+		<input type="text" name="username" id="username" />
+
+		<label>Password	</label>
+		<input type="text" name="password" id="password" />
+		
+		<label>FirstClass Email </label>
+		<input type="text" name="email" id="email" />
+
+		<button type="submit">Register</button>
+			
+		<div class="spacer"></div>
+
+		</form>
+	</div>
+
+{% endblock %}

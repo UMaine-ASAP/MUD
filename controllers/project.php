@@ -4,6 +4,7 @@ require_once('libraries/Idiorm/idiorm.php');
 require_once('libraries/Paris/paris.php');
 require_once('libraries/constant.php');
 require_once('models/project.php');
+require_once('controllers/authentication.php');
 
 /**
  * Controller handling Project objects
@@ -16,26 +17,24 @@ class ProjectController
 	 *	Create a new Project object with the specified creator_id, title, abstract, description, and privacy.
 	 *		@param int creator_user_id is the ID of the user creating the project
 	 *		@param string title is the title of the project
-	 *		@param string abstract is the abstract of the project
 	 *		@param string description is the description of the project
-	 *		@param bool privacy is the privacy of the project
+	 *		@param int type is the type of the Project
 	 *
 	 *	@return the created Project object if successful, false otherwise.
 	 */
-	static function createProject($title, $description, $type, $privacy)
+	public static function createProject($title, $description, $type)
 	{
-		// Check for creation privileges
-
-		if (!$project = Model::factory('Project')->create())
+		// Check for creation privileges (for now, only that a User is logged in)
+		if ((!$user_id = AuthenticationController::get_current_user_id()) ||
+			(!$project = Model::factory('Project')->create()))
 		{
 			return false;
 		}
 
-		$project->creator_user_id = USER_ID;	// Check for calling USER ID
+		$project->addPermissionForUser($user_id, OWNER);
 		$project->title = $title;
 		$project->description = $description;
 		$project->type = $type;
-		$project->private = $privacy;
 
 		if (!$project->save())
 		{
@@ -51,25 +50,21 @@ class ProjectController
 	 * 		@param int id is the ID of the project being edited
 	 *		@param string abstract is the abstract of the project. The abstract will not be changed if an empty string is passed.
 	 *		@param string is the description of the project. The description will not be changed if an empty string is passed
-	 *		@param bool privacy is the project's privacy (TRUE for private, FALSE for public)
 	 *
 	 *	@return true if the project was successfully edited, false otherwise
 	 */
-	static function editProject($id, $title, $description, $type, $privacy)
+	public static function editProject($id, $title = NULL, $description = NULL, $type = NULL)
 	{
-		$project = self::getProject($id);
-
-		if (!$project)
+		if ((!$user_id = AuthenticationController::get_current_user_id()) ||
+			(!$project = self::getProject($id)) ||
+			(!$project->havePermissionOrHigher(EDIT)))	// Check for EDIT privileges
 		{
 			return false;
 		}
 
-		// Check for editing permissions
-
 		if (!is_null($title))		{ $project->title = $title; }
 		if (!is_null($description))	{ $project->description = $description;	}
 		if (!is_null($type))		{ $project->type = $type; }
-		if (!is_null($privacy))		{ $project->privacy = $privacy; }
 
 		return $project->save();
 	}
@@ -80,16 +75,14 @@ class ProjectController
 	 *
 	 *	@return true if the project was successfully deleted, otherwise false
 	 */
-	static function deleteProject($id)
+	public static function deleteProject($id)
 	{
-		$project = self::getProject($id);
-
-		if (!$project)
+		if ((!$user_id = AuthenticationController::get_current_user_id()) ||
+			(!$project = self::getProject($id)) ||
+			(!$project->havePermissionOrHigher(OWNER)))	// User musr have OWNER permissions on project
 		{
 			return false;
 		}
-
-		// Check for deletion permissions
 		
 		return $project->delete();
 	}
@@ -101,20 +94,17 @@ class ProjectController
 	 *
 	 * @return The Project object if successful, false otherwise.
 	 */
-	static function viewProject($id)
+	public static function viewProject($id)
 	{
-		$project = self::getProject($id);
-		
-		if (!$project)
+		if ((!$user_id = AuthenticationController::get_current_user_id()) ||
+			(!$project = self::getProject($id)) ||
+			(!$project->havePermissionOrHigher(READ)))	// User musr have READ permissions on project
 		{
 			return false;
 		}
-
-		// Check for viewing permissions
 		
 		return $project;
 	}
-
 
 	/**
 	 * Retrieve a specific Project object.
@@ -125,6 +115,55 @@ class ProjectController
 	private static function getProject($id)
 	{
 		return Model::factory('Project')->find_one($id);
+	}
+	
+	/**
+	 *	Add a Media object to a Project object.
+	 *
+	 *	Calling user must have WRITE privileges to the parent Project, and OWNER
+	 *	privileges to the child Media.
+	 *	
+	 *	@param	int		$proj_id		Identifier of the Project object to add Media to
+	 *	@param	int		$media_id		Identifier of the Media object to add to the Project
+	 *
+	 *	@return	bool					True if successful, false otherwise.
+	 */
+	public static function addMediaToProject($proj_id, $media_id)
+	{
+		if ((!$user_id = AuthenticationController::get_current_user_id()) ||
+			(!$project = self::getProject($proj_id)) ||
+			(!$project->havePermissionOrHigher(WRITE)) ||	// User must have WRITE permission on parent
+			(!$media = MediaController::viewMedia($media_id)) ||	// Requires 'viewing' (or higher, assumed) permissions on the Media
+			(!$media->havePermissionOrHigher(OWNER)))		// User must have OWNER permission on child
+		{
+			return false;
+		}
+
+		return $project->addMedia($media_id);
+	}
+
+	/**
+	 *	Remove a 'child' Media object from a Project object.
+	 *
+	 *	Calling user must have WRITE privileges of the Project object.
+	 *	
+	 *	@param	int		$proj_id		Identifier of the Project the Media is to be added to
+	 *	@param	int		$media_id		Identifier of the Media to be added to the Project
+	 *
+	 *	@return	bool					True if successful, false otherwise.
+	 */
+	public static function removeChildFromPortfolio($parent_id, $child_id, $is_portfolio)
+	{
+		if ((!$user_id = AuthenticationController::get_current_user_id()) ||
+			(!$project = self::getProject($proj_id)) ||
+			(!$media = MediaController::getMedia($media_id)) ||
+			(!$media->havePermissionOrHigher(WRITE)) ||	// User must have WRITE permission on parent
+			(!in_array($media_id, $project->media)))
+		{
+			return false;
+		}
+
+		return $project->removeMedia($media_id);
 	}
 }
 

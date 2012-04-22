@@ -1,0 +1,36 @@
+{% extends 'layout.html' %}
+
+{% block page_title %}New Media Portfolio - Login{% endblock %}
+
+{% block content %}
+
+	<ul class="menu sgray fade" id="menu">
+		<li><a href="{{ flash['web_root'] }}">New Media Portfolio 2012</a></li>
+	</ul>
+
+	<header>Login</header>
+	
+	<hr>
+	
+	<div id="themed" class="loginForm">
+		
+		<form id="form" name="form" method="post" action="{{ flash['web_root'] }}/login">
+		
+		<label>Username</label>
+		<input type="text" name="username" id="username" />
+
+		<label>Password	</label>
+		<input type="password" name="password" id="password" />
+
+		<button type="submit">Login</button>
+			
+		<div class="spacer"></div>
+
+		{% if flash['error'] is defined %}
+			<label>Login failed, please retype username and password</label>
+		{% endif %}
+
+		</form>
+	</div>
+
+{% endblock %}

@@ -123,22 +123,39 @@ CREATE TABLE `REPO_Day_schedules` (
 
 -- ---
 -- 'REPO_Assignments'
--- Assignments created for a project to be done for. (provides context for projects)
+-- Assignments created by instructors to instantiate on sections. (provides context for projects)
 -- ---
 
 DROP TABLE IF EXISTS `REPO_Assignments`;
 		
 CREATE TABLE `REPO_Assignments` (
   `assign_id` INTEGER NOT NULL AUTO_INCREMENT,
-  `section_id` INTEGER NOT NULL,
-  `portfolio_id` INTEGER NULL DEFAULT NULL,
-  `creator_user_id` INTEGER NOT NULL,
+  `class_id` INTEGER NULL DEFAULT NULL,
   `title` VARCHAR(255) NOT NULL,
   `description` TEXT NULL DEFAULT NULL,
   `requirements` TEXT NULL DEFAULT NULL,
-  `due_date` DATE NULL DEFAULT NULL,
+  `deactivated` BOOL NOT NULL DEFAULT 0,
   PRIMARY KEY (`assign_id`)
-) COMMENT='Assignments created for a project to be done for';
+) COMMENT='Assignments instantiated for submissions';
+
+-- ---
+-- 'REPO_Assignment_instances'
+-- Assignments instantiated for submissions. (provides context for projects)
+-- ---
+
+DROP TABLE IF EXISTS `REPO_Assignment_instances`;
+		
+CREATE TABLE `REPO_Assignment_instances` (
+  `instance_id` INTEGER NOT NULL AUTO_INCREMENT,
+  `assign_id` INTEGER NOT NULL,
+  `section_id` INTEGER NULL DEFAULT NULL,
+  `portfolio_id` INTEGER NOT NULL,
+  `title` VARCHAR(255) NULL DEFAULT NULL,
+  `description` TEXT NULL DEFAULT NULL,
+  `requirements` TEXT NULL DEFAULT NULL,
+  `due_date` DATE NULL DEFAULT NULL,
+  PRIMARY KEY (`instance_id`)
+) COMMENT='Assignments instantiated for submissions';
 
 -- ---
 -- 'REPO_Assignment_access_map'
@@ -153,7 +170,22 @@ CREATE TABLE `REPO_Assignment_access_map` (
   `group_id` INTEGER NOT NULL,
   `access_type` INTEGER NOT NULL,
   PRIMARY KEY (`id`)
-) COMMENT='Mapping of access levels to specific assignments';
+) COMMENT='Mapping of access levels to assignments';
+
+-- ---
+-- 'REPO_Assignment_instance_access_map'
+-- Mapping of access levels to specific assignment instances
+-- ---
+
+DROP TABLE IF EXISTS `REPO_Assignment_instance_access_map`;
+		
+CREATE TABLE `REPO_Assignment_instance_access_map` (
+  `id` INTEGER NOT NULL AUTO_INCREMENT,
+  `instance_id` INTEGER NOT NULL,
+  `group_id` INTEGER NOT NULL,
+  `access_type` INTEGER NOT NULL,
+  PRIMARY KEY (`id`)
+) COMMENT='Mapping of access levels to assignment instances';
 
 -- ---
 -- 'REPO_Projects'
@@ -164,10 +196,8 @@ DROP TABLE IF EXISTS `REPO_Projects`;
 		
 CREATE TABLE `REPO_Projects` (
   `proj_id` INTEGER NOT NULL AUTO_INCREMENT,
-  `creator_user_id` INTEGER NOT NULL,
   `title` VARCHAR(255) NOT NULL,
   `description` TEXT NULL DEFAULT NULL,
-  `private` BOOL NOT NULL DEFAULT 1,
   `type` INTEGER NOT NULL,
   PRIMARY KEY (`proj_id`)
 ) COMMENT='Unit of work, typically done for an assignment';
@@ -210,7 +240,6 @@ DROP TABLE IF EXISTS `REPO_Portfolios`;
 		
 CREATE TABLE `REPO_Portfolios` (
   `port_id` INTEGER NOT NULL AUTO_INCREMENT,
-  `owner_user_id` INTEGER NOT NULL,
   `title` VARCHAR(255) NOT NULL,
   `description` TEXT NULL DEFAULT NULL,
   `private` BOOL NOT NULL DEFAULT 1,
@@ -244,6 +273,7 @@ CREATE TABLE `REPO_Portfolio_project_map` (
   `port_id` INTEGER NOT NULL,
   `child_id` INTEGER NOT NULL,
   `child_is_portfolio` BOOL NOT NULL DEFAULT 0,
+  `child_privacy` TINYINT(1) NOT NULL DEFAULT 0,	-- Not a BOOL, because 3 values: public, private, submitted
   PRIMARY KEY (`id`)
 ) COMMENT='A map of projects and portfolios to portfolios';
 
@@ -264,10 +294,10 @@ CREATE TABLE `AUTH_Users` (
   `email` VARCHAR(255) NULL DEFAULT NULL,
   `email_priv` BOOL NOT NULL DEFAULT 0,
   `addn_contact` VARCHAR(255) NULL DEFAULT NULL,
-  `bio` TEXT NOT NULL,
+  `bio` TEXT NULL DEFAULT NULL,
   `user_pic` TEXT NULL DEFAULT NULL,
-  `major` INTEGER NULL DEFAULT NULL,
-  `minor` INTEGER NULL DEFAULT NULL,
+  `major` VARCHAR(255) NULL DEFAULT NULL,
+  `minor` VARCHAR(255) NULL DEFAULT NULL,
   `grad_year` INTEGER NULL DEFAULT NULL,
   `type_id` INTEGER NOT NULL,
   `deactivated` BOOL NOT NULL DEFAULT 0,
@@ -332,9 +362,10 @@ CREATE TABLE `REPO_Media` (
   `description` TEXT NULL DEFAULT NULL,
   `created` DATETIME NOT NULL,
   `edited` DATETIME NULL DEFAULT NULL,
-  `creator_user_id` INTEGER NOT NULL,
   `filename` TEXT NOT NULL,
-  `private` BOOL NOT NULL DEFAULT 1,
+  `filesize` INTEGER NOT NULL,
+  `md5` CHAR(32) NOT NULL,
+  `extension` VARCHAR(10) NOT NULL,
   PRIMARY KEY (`media_id`)
 ) COMMENT='Unit of media contained within a body of work';
 
@@ -380,35 +411,6 @@ CREATE TABLE `REPO_Project_media_map` (
   `media_id` INTEGER NOT NULL,
   PRIMARY KEY (`id`)
 ) COMMENT='Mapping of media to bodies of work';
-
--- ---
--- 'AUTH_Group_user_role_map'
--- Mapping of group users to their specified role(s)
--- ---
-
--- DROP TABLE IF EXISTS `AUTH_Group_user_role_map`;
--- 		
--- CREATE TABLE `AUTH_Group_user_role_map` (
---	 `id` INTEGER NOT NULL AUTO_INCREMENT,
---   `group_id` INTEGER NOT NULL,
---   `user_id` INTEGER NOT NULL,
---   `role_id` INTEGER NOT NULL,
---   PRIMARY KEY (`id`)
--- ) COMMENT='Mapping of group users to their specified role(s)';
-
--- ---
--- 'AUTH_Roles'
--- All different roles a user can have within a group (ex: owner, programmer, designer, etc.)
--- ---
-
--- DROP TABLE IF EXISTS `AUTH_Roles`;
--- 		
--- CREATE TABLE `AUTH_Roles` (
---   `role_id` INTEGER NOT NULL AUTO_INCREMENT,
---   `name` VARCHAR(255) NOT NULL,
---   `description` TEXT NULL DEFAULT NULL,
---   PRIMARY KEY (`role_id`)
--- ) COMMENT='All different roles a user can have within a group';
 
 -- ---
 -- 'EVAL_Forms'
@@ -568,8 +570,6 @@ ALTER TABLE `REPO_Project_media_map` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=
 ALTER TABLE `REPO_Media` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 ALTER TABLE `AUTH_Groups` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 ALTER TABLE `REPO_Portfolio_access_map` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `AUTH_Group_user_role_map` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
--- ALTER TABLE `AUTH_Roles` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 ALTER TABLE `AUTH_User_types` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 ALTER TABLE `EVAL_Forms` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 ALTER TABLE `EVAL_Components` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
@@ -586,6 +586,7 @@ ALTER TABLE `REPO_Project_types` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8
 ALTER TABLE `REPO_Assignment_access_map` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 ALTER TABLE `REPO_Project_access_map` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 ALTER TABLE `REPO_Media_access_map` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+ALTER TABLE `REPO_Assignment_instance_access_map` ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 
 -- ---------------------------
@@ -610,15 +611,20 @@ ALTER TABLE `REPO_Section_access_map` ADD FOREIGN KEY (section_id) REFERENCES `R
 ALTER TABLE `REPO_Section_access_map` ADD FOREIGN KEY (group_id) REFERENCES `AUTH_Groups` (`group_id`);
 ALTER TABLE `REPO_Section_access_map` ADD FOREIGN KEY (access_type) REFERENCES `REPO_Access_levels` (`access_id`);
 
-ALTER TABLE `REPO_Assignments` ADD FOREIGN KEY (section_id) REFERENCES `REPO_Sections` (`section_id`);
-ALTER TABLE `REPO_Assignments` ADD FOREIGN KEY (creator_user_id) REFERENCES `AUTH_Users` (`user_id`);
-ALTER TABLE `REPO_Assignments` ADD FOREIGN KEY (portfolio_id) REFERENCES `REPO_Portfolios` (`port_id`);
+ALTER TABLE `REPO_Assignments` ADD FOREIGN KEY (class_id) REFERENCES `REPO_Classes` (`class_id`);
+
+ALTER TABLE `REPO_Assignment_instances` ADD FOREIGN KEY (assign_id) REFERENCES `REPO_Assignments` (`assign_id`);
+ALTER TABLE `REPO_Assignment_instances` ADD FOREIGN KEY (section_id) REFERENCES `REPO_Sections` (`section_id`);
+ALTER TABLE `REPO_Assignment_instances` ADD FOREIGN KEY (portfolio_id) REFERENCES `REPO_Portfolios` (`port_id`);
 
 ALTER TABLE `REPO_Assignment_access_map` ADD FOREIGN KEY (assign_id) REFERENCES `REPO_Assignments` (`assign_id`);
 ALTER TABLE `REPO_Assignment_access_map` ADD FOREIGN KEY (group_id) REFERENCES `AUTH_Groups` (`group_id`);
 ALTER TABLE `REPO_Assignment_access_map` ADD FOREIGN KEY (access_type) REFERENCES `REPO_Access_levels` (`access_id`);
 
-ALTER TABLE `REPO_Projects` ADD FOREIGN KEY (creator_user_id) REFERENCES `AUTH_Users` (`user_id`);
+ALTER TABLE `REPO_Assignment_instance_access_map` ADD FOREIGN KEY (instance_id) REFERENCES `REPO_Assignment_instances` (`instance_id`);
+ALTER TABLE `REPO_Assignment_instance_access_map` ADD FOREIGN KEY (group_id) REFERENCES `AUTH_Groups` (`group_id`);
+ALTER TABLE `REPO_Assignment_instance_access_map` ADD FOREIGN KEY (access_type) REFERENCES `REPO_Access_levels` (`access_id`);
+
 ALTER TABLE `REPO_Projects` ADD FOREIGN KEY (type) REFERENCES `REPO_Project_types` (`type_id`);
 
 ALTER TABLE `REPO_Project_media_map` ADD FOREIGN KEY (proj_id) REFERENCES `REPO_Projects` (`proj_id`);
@@ -630,12 +636,6 @@ ALTER TABLE `REPO_Project_access_map` ADD FOREIGN KEY (access_type) REFERENCES `
 
 ALTER TABLE `AUTH_Group_user_map` ADD FOREIGN KEY (group_id) REFERENCES `AUTH_Groups` (`group_id`);
 ALTER TABLE `AUTH_Group_user_map` ADD FOREIGN KEY (user_id) REFERENCES `AUTH_Users` (`user_id`);
-
--- ALTER TABLE `AUTH_Group_user_role_map` ADD FOREIGN KEY (group_id) REFERENCES `AUTH_Group_user_map` (`group_id`);
--- ALTER TABLE `AUTH_Group_user_role_map` ADD FOREIGN KEY (user_id) REFERENCES `AUTH_Group_user_map` (`user_id`);
--- ALTER TABLE `AUTH_Group_user_role_map` ADD FOREIGN KEY (role_id) REFERENCES `AUTH_Roles` (`role_id`);
-
-ALTER TABLE `REPO_Portfolios` ADD FOREIGN KEY (owner_user_id) REFERENCES `AUTH_Users` (`user_id`);
 
 ALTER TABLE `REPO_Portfolio_access_map` ADD FOREIGN KEY (port_id) REFERENCES `REPO_Portfolios` (`port_id`);
 ALTER TABLE `REPO_Portfolio_access_map` ADD FOREIGN KEY (group_id) REFERENCES `AUTH_Groups` (`group_id`);
@@ -649,7 +649,6 @@ ALTER TABLE `REPO_Portfolio_project_map` ADD FOREIGN KEY (port_id) REFERENCES `R
 ALTER TABLE `AUTH_Users` ADD FOREIGN KEY (type_id) REFERENCES `AUTH_User_types` (`type_id`);
 
 ALTER TABLE `REPO_Media` ADD FOREIGN KEY (type) REFERENCES `REPO_Media_types` (`type_id`);
-ALTER TABLE `REPO_Media` ADD FOREIGN KEY (creator_user_id) REFERENCES `AUTH_Users` (`user_id`);
 
 ALTER TABLE `REPO_Media_access_map` ADD FOREIGN KEY (media_id) REFERENCES `REPO_Media` (`media_id`);
 ALTER TABLE `REPO_Media_access_map` ADD FOREIGN KEY (group_id) REFERENCES `AUTH_Groups` (`group_id`);
