@@ -1,29 +1,90 @@
 {% extends 'layout.html' %}
 
-{% block page_title %}New Media Portfolio - Edit Project{% endblock %}
+{% block page_title %}
+	{% if project_id == -1 %}
+	New Media Portfolio - Add Project
+	{% else %}
+	New Media Portfolio - Edit Project
+	{% endif %}	
+{% endblock %}
 
 {% block content %}
 
-	<ul class="menu sgray fade" id="menu">
-		<li><a href="{{ flash['web_root'] }}">New Media Portfolio 2012</a></li>
-		<li class="floatr"><a href="{{ flash['web_root'] }}/logout">Log Out</a></li>
-	</ul>
 
-	<header>Edit Project</header>
+	<div class="header">
+		{% if project_id == -1 %}
+		Add New Project
+		{% else %}
+		Edit Project
+		{% endif %}
+	</div>
 	
 	<hr>
 	
-	<div id="themed" class="loginForm">
+	<div id="themed" class="form">
 	
-		<form id="form" name="form" method="post" action="{{ flash['web_root'] }}/project/{{ project_id }}/edit">
-		
+		<form id="form" name="form" method="post" enctype="multipart/form-data" action="{{ flash['web_root'] }}/project/{{ project_id }}/edit">
+
+
 		<label>Title</label>
-		<input type="text" name="title" id="title" value="{{ title }}" />
+		<input class='medium' type="text" name="title" id="title" value="{{ title }}" />
+
+		<div class='spacer'></div>
 
 		<label>Description</label>
-		<input type="text" name="description" id="description" value="{{ description }}" />
+		<textarea class='medium' name="description" id="description" rows="8" required>{{ description }}</textarea>
 
-		<button type="submit">Submit</button>
+		<div class='spacer'></div>
+
+		<label>Thumbnail</label>
+		<input name="thumbnail" type="file" style='margin-bottom: 0px;'/>
+		<div class='spacer'></div>		
+		<label style='width: 300px; display: block; margin-bottom: 10px;'> (images will be rescaled to 100x100)</label>
+		<div class='spacer'></div>
+
+
+		<div class='spacer'></div>
+
+		<button type="submit">Save</button>
+
+		<div class='spacer'></div>
+
+		{% if project_id != -1 %}
+
+		<!-- Editing existing project -->
+		<h1>Media</h1>
+
+		<div class='spacer'></div>
+		<hr>
+
+		<div class='media_items'>
+		{% for media in media_items %}
+			<div class='media' style='position:relative'>
+				<div class="title">{{ media.title }}</div>
+				<div class="desc">{{ media.description }}</div>
+				<div class="actions" style="margin-top:5px">
+					<a href="{{ flash['web_root'] }}/project/{{ project_id }}/media/{{ media.media_id }}/edit"><img src="{{ flash['web_root'] }}/templates/images/icon_Edit.png" border="0" alt="Edit"></a></br>
+					<a href="{{ flash['web_root'] }}/project/{{ project_id }}/media/{{ media.media_id }}/delete"><img src="{{ flash['web_root'] }}/templates/images/icon_Delete.png" border="0" alt="Delete"></a>
+				</div>
+			</div>
+
+		{% endfor %}
+		</div>
+		<br>
+		<div class='spacer'></div>
+		<a class='button left reset' href="{{ flash['web_root'] }}/project/{{ project_id }}/media/add">Add Media</a>
+
+		{% else %}
+		<!-- Adding new project -->
+		<h1>Media</h1>
+		<hr>		
+		<div>You must create the project before you can add media.</div>
+		{% endif %}
+
+		<div class='spacer'></div>
+
+
+		<hr>
 			
 		<div class="spacer"></div>
 

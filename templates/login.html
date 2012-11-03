@@ -4,31 +4,26 @@
 
 {% block content %}
 
-	<ul class="menu sgray fade" id="menu">
-		<li><a href="{{ flash['web_root'] }}">New Media Portfolio 2012</a></li>
-	</ul>
+    <div class="header">{% if flash['header'] is defined %}{{ flash['header'] }}{% else %}Login{% endif %}</div>
 
-	<header>Login</header>
-	
+
 	<hr>
-	
-	<div id="themed" class="loginForm">
+	{% if flash['error'] is defined %}
+		<h3>Login failed, please retype your username and password below...</h3>
+	{% endif %}
+	<div id="themed" class="loginForm" style="margin-left:250px;">
 		
 		<form id="form" name="form" method="post" action="{{ flash['web_root'] }}/login">
-		
 		<label>Username</label>
 		<input type="text" name="username" id="username" />
 
 		<label>Password	</label>
 		<input type="password" name="password" id="password" />
 
-		<button type="submit">Login</button>
-			
-		<div class="spacer"></div>
+		<button class='first' type="submit">Login</button>
+		<a class='button' href='{{ flash['web_root'] }}/register'>Register</a>
 
-		{% if flash['error'] is defined %}
-			<label>Login failed, please retype username and password</label>
-		{% endif %}
+		<div class="spacer"></div>
 
 		</form>
 

@@ -1,0 +1,43 @@
+{% extends 'layout.html' %}
+
+{% block page_title %}
+	New Media Portfolio - Delete Project
+{% endblock %}
+
+{% block content %}
+
+
+	<div class="header">
+		Delete Project?
+	</div>
+	
+	<hr>
+	
+	<div id="themed" class="">
+	
+		<form id="form" name="form" method="post" action="{{ flash['web_root'] }}/project/{{ project_id }}/delete">
+
+		<a class='button reset' href='{{ flash['web_root'] }}/portfolio'>Cancel</a>
+
+		<button class='reset' type="submit">Delete</button>
+			
+		<div class="project">
+			<div class="type">
+				{% if thumbnail != NULL %}
+				<img src="{{ flash['web_root'] }}/{{ thumbnail }}" border="0" width="100" height="100" alt="Thumb">
+				{% endif %}
+			</div>
+			<div class="title">{{ title }}</div>
+			</br>
+			<div class="desc">{{ description }}</div>
+		</div>
+
+		<div class="spacer"></div>
+
+		</form>
+
+	</div>
+
+
+{% endblock %}
+

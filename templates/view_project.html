@@ -3,16 +3,65 @@
 {% block page_title %}New Media Portfolio - View Project{% endblock %}
 
 {% block content %}
-
-	<ul class="menu sgray fade" id="menu">
-		<li><a href="{{ flash['web_root'] }}">New Media Portfolio 2012</a></li>
-		<li class="floatr"><a href="{{ flash['web_root'] }}/logout">Log Out</a></li>
-	</ul>
-
-	<header>{{ title }}</header>
+	<div class="header">
+		{{ title }}
+		<div id='themed' style='right:100px;' >
+			<a class='button right' href="{{ flash['web_root'] }}/project/{{ project_id }}/edit" type="submit">Edit Project</a>
+		</div>
+	</div>
 	
 	<hr>
 	
-	<label>{{ description }}</label>
+	<p>{{ description }}</p>
+
+	<div class='media_items'>
+	{% for media in media_items %}
+
+			{% if media.mimetype in ['image/png', 'image/jpeg', 'image/gif'] %}
+			<!-- Image -->
+			<div class='media image'>
+				<div class="title">{{ media.title }}</div>
+				<img src="{{ flash['web_root'] }}/media/{{ media.filename }}"/>
+				<div class="desc">{{ media.description }}</div>
+			</div>
+			{% elseif media.mimetype in ['audio/mp32'] %}
+			<!-- Audio -->
+			<div class='media audio'>
+				<div class="title">{{ media.title }}</div>
+				<div> Audio </div>
+				<div class="desc">{{ media.description }}</div>
+			</div>
+			{% elseif media.mimetype in ['video/mp4', 'video/ogv', 'video/webm'] %}
+			<!-- Video -->
+			<div class='media video'>
+				<video controls="controls"> 
+					<div class="title">{{ media.title }}</div>
+					<source src="{{ flash['web_root'] }}/media/{{ media.filename }}" type="{{ media.mimetype }}" /> 				
+				<!--
+				<source src="" type="video/mp4" /> 
+				<source src="" type="video/ogv" /> 
+				<source src="" type="video/webm" />
+  				-->
+					Your browser does not support the video tag </video>
+					<a href="{{ flash['web_root'] }}/media/{{ media.filename }}">Download the file here</a>
+					<div class="desc">{{ media.description }}</div>
+			</div>
+			{% elseif media.mimetype == '' %}
+			<!-- Text -->
+			<div class='media text'>
+				<div class="title">{{ media.title }}</div>
+				<p class="desc">{{ media.description }}</p>
+			</div>
+			{% else %}
+			<!-- A generic file -->
+			<div class='media file'>
+				<div class="title">{{ media.title }}</div>
+				<div>File: <a href="{{ flash['web_root'] }}/media/{{ media.filename }}">{{ media.title }}</a></div>
+				<div class="desc">{{ media.description }}</div>
+			</div>
+			{% endif %}
+		</div>
+	{% endfor %}
+	</div>	
 
 {% endblock %}

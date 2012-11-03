@@ -41,9 +41,13 @@ class PortfolioController
 		$port->title = $title;
 		$port->description = $description;
 		$port->private = $private;
-		// Add current User as OWNER
-		$port->addPermissionForUser($user, OWNER);
+		if (!$port->save())
+		{
+			return false;
+		}
 
+		// Add current User as OWNER (we need to save prior to this to have an ID associate with the Portfolio)
+		$port->addPermissionForUser($user_id, OWNER);
 		if (!$port->save())
 		{
 			$port->delete();
@@ -83,12 +87,7 @@ class PortfolioController
 		if (!is_null($description)) { $port->description = $description; }
 		if (!is_null($private))		{ $port->private = $private; }
 
-		if (!$port->save())
-		{
-			return false;
-		}
-
-		return true;
+		return $port->save();
 	}
 
 
@@ -167,7 +166,6 @@ class PortfolioController
 		{
 			$result = ORM::for_table('REPO_Portfolio_access_map')
 				->table_alias('access')
-				->select('access.port_id')
 				->join('AUTH_Group_user_map', 'access.group_id = AUTH_Group_user_map.group_id')
 				->where('access.access_type', OWNER)
 				->where('AUTH_Group_user_map.user_id', $user_id)

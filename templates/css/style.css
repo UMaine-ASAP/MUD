@@ -9,14 +9,19 @@ html,body,div,span,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,abbr,address
 }
 
 body {
-	line-height: 1;
-	position: absolute;
-	top: 30%;
-	left: 30%;
-	width: 30em;
-	height: 18em;
-	margin-top: -9em;
-	margin-left: -15em
+	width: 960px;
+	background: #FFF;
+	color: #666;
+	border: solid 5px #d1d1d1;
+	-moz-border-radius: 26px;
+	-webkit-border-radius: 26px;
+	border-radius: 26px;
+	padding: 10px 30px;
+	display: block;
+	margin-top: 20px;
+	margin-left: auto;
+	margin-right: auto;
+	font-family: "Lucida Grande","Lucida Sans Unicode",Verdana,Arial,Helvetica,sans-serif;
 }
 
 article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section,container {
@@ -106,7 +111,7 @@ h2,h3 {
 h3 {
 	text-align: center;
 	margin: 0;
-	font-size: 12px;
+	font-size: 11px;
 	font-weight: bold
 }
 
@@ -128,7 +133,7 @@ code,kbd {
 	-webkit-border-radius: 4px;
 	padding: 0 4px;
 	color: #666;
-	font-size: 12px
+	font-size: 11px
 }
 
 pre {
@@ -139,7 +144,7 @@ pre {
 	-webkit-border-radius: 4px;
 	padding: 5px 10px;
 	color: #666;
-	font-size: 12px
+	font-size: 11px
 }
 
 pre code {
@@ -149,17 +154,21 @@ pre code {
 }
 
 a {
-	color: #70a23e
+	color: #5C6F91;
 }
 
-header {
+.header {
 	padding: 30px 0;
 	text-align: center;
 	font-size: 24px
 }
 
-body {
-	font-family: "Lucida Grande","Lucida Sans Unicode",Verdana,Arial,Helvetica,sans-serif
+.left {
+	float: left;
+}
+
+.right {
+	float: right;
 }
 
 .spacer {
@@ -170,6 +179,12 @@ body {
 .loginForm {
 	margin: 0 auto;
 	width: 400px;
+	padding: 14px
+}
+
+.editForm {
+	margin: 0 auto;
+	width: 800px;
 	padding: 14px
 }
 
@@ -188,6 +203,7 @@ body {
 
 #themed label {
 	display: block;
+	font-size: 11px;
 	font-weight: bold;
 	text-align: right;
 	width: 140px;
@@ -203,21 +219,34 @@ body {
 	width: 140px
 }
 
-#themed input {
+#themed input, textarea {
 	float: left;
-	font-size: 12px;
+	font-size: 11px;
+	font-family: "Lucida Grande","Lucida Sans Unicode",Verdana,Arial,Helvetica,sans-serif;
 	padding: 4px 2px;
 	border: 1px solid #DDD;
 	border-radius: 4px;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 	width: 200px;
-	margin: 2px 0 20px 10px
+	margin: 2px 0 20px 10px;
+	text-transform: none;
+	font-weight: normal;
+	font-style: normal;
+	text-decoration: none;
 }
 
-#themed button {
-	clear: both;
+#themed input.medium, textarea.medium {
+	width: 400px;
+}
+
+#themed button.first, #themed a.button.first {
+	
+}
+
+#themed button, #themed a.button {
 	margin-left: 150px;
+	margin-bottom: 10px;
 	background-color: #a5b8da;
 	background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0%,#a5b8da),color-stop(100%,#7089b3));
 	background-image: -webkit-linear-gradient(top,#a5b8da,#7089b3);
@@ -238,14 +267,16 @@ body {
 	color: #fff;
 	font: bold 11px "Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Verdana,sans-serif;
 	line-height: 1;
+	display: inline-block;
 	padding: 8px 0;
 	text-align: center;
 	text-shadow: 0 -1px 1px #64799e;
 	text-transform: uppercase;
-	width: 150px
+	width: 150px;
+	text-decoration: none;
 }
 
-#themed button:hover {
+#themed button:hover, #themed a.button:hover {
 	background-color: #9badcc;
 	background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0%,#9badcc),color-stop(100%,#687fa6));
 	background-image: -webkit-linear-gradient(top,#9badcc,#687fa6);
@@ -263,7 +294,7 @@ body {
 	cursor: pointer
 }
 
-#themed button:active {
+#themed button:active, #themed a.button:active {
 	border: 1px solid #546685;
 	-webkit-box-shadow: inset 0 0 8px 2px #7e8da6,0 1px 0 0 #eee;
 	-moz-box-shadow: inset 0 0 8px 2px #7e8da6,0 1px 0 0 #eee;
@@ -271,16 +302,7 @@ body {
 }
 
 .container {
-	display: inline-block;
-	width: 960px;
-	background: #FFF;
-	color: #666;
-	font: 12px Arial,Verdana,sans-serif;
-	border: solid 5px #d1d1d1;
-	-moz-border-radius: 26px;
-	-webkit-border-radius: 26px;
-	border-radius: 26px;
-	padding: 10px 30px
+	
 }
 
 .menu,.menu ul {
@@ -435,7 +457,7 @@ body {
 	font-size: 12px;
 	line-height: 16px;
 	text-shadow: 0 1px #f8f8f8;
-	padding: 8px 12px 8px
+	padding: 8px 10px 8px
 }
 
 .sgray>li:hover>a {
@@ -495,7 +517,7 @@ body {
 .sgray ul a {
 	color: #666;
 	font-weight: bold;
-	font-size: 12px;
+	font-size: 11px;
 	line-height: 18px;
 	padding: 5px 10px;
 	border-top: 1px solid #e4e4e4
@@ -543,7 +565,7 @@ body {
 	font-size: 14px;
 	color: #444;
 	font-weight: bold;
-	margin: 10px 10px 0
+	margin: 11px 11px 0
 }
 
 .sgray ol {
@@ -554,7 +576,7 @@ body {
 
 .sgray ol a {
 	color: #777;
-	font-size: 12px;
+	font-size: 10px;
 	padding: 3px 0
 }
 
@@ -579,9 +601,9 @@ body {
 	color: #555
 }
 
-#projects {
+.projects {
 	font-family: Verdana,Geneva,sans-serif;
-	font-size: 12px;
+	font-size: 11px;
 	height: 110px;
 	width: 940px;
 	margin-bottom: 10px;
@@ -596,7 +618,7 @@ body {
 	-moz-border-radius: 5px
 }
 
-#title {
+.title {
 	font-size: 24px;
 	font-weight: bold;
 	text-align: left;
@@ -606,15 +628,15 @@ body {
 	padding-left: 10px
 }
 
-#desc {
-	font-size: 12px;
+.desc {
+	font-size: 11px;
 	color: #848484;
 	padding-left: 10px;
 	margin-left: 120px;
 	width: 700px
 }
 
-#type {
+.type {
 	float: left;
 	padding-right: 5px;
 	border: solid 1px #e1e8ec;
@@ -625,12 +647,44 @@ body {
 	background-color: #a5a5a5
 }
 
-#actions {
+.actions {
 	height: 105px;
 	width: 72px;
 	margin-bottom: 10px;
 	margin-top: 5px;
 	border: solid 1px #e1e8ec;
 	padding: 5px;
-	margin-bottom: 5px
+	margin-bottom: 5px;
+	float:right;
+}
+
+.breadcrumb-trail {
+	font-family: Verdana,Geneva,sans-serif;
+	font-size: 11px;
+	margin-bottom: 10px;
+	margin-top: 10px;
+	margin-right: 10px;
+	line-height: 120%;
+	text-align: left;
+	border: solid 1px #e1e8ec;
+	padding: 5px;
+	margin-bottom: 5px;
+	border-radius: 5px;
+	-moz-border-radius: 5px
+}
+
+.breadcrumb a:link {
+	color: #374861;
+}
+
+.breadcrumb a:visited {
+	color: #374861;
+}
+
+.breadcrumb a:hover {
+	color: #a5b8da;
+}
+
+.breadcrumb a:active {
+	color: #a5b8da;
 }}

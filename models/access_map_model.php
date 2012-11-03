@@ -151,7 +151,6 @@ class AccessMapModel extends Model
 			return false;
 		}
 
-		print "Setting ".static::$_id_column." to ".$this->id();
 		$map->__set(static::$_id_column, $this->id());
 		$map->group_id = $group_id;
 		$map->access_type = $perm_id;
@@ -200,7 +199,8 @@ class AccessMapModel extends Model
 	 */
 	public function addPermissionForUser($user_id, $perm_id)
 	{
-		if (!$group = GroupController::createGroup($this->title . " Permissions", "Permissions for " . $this->title, true))
+		if ((!$group = GroupController::createGroup($this->title . " Permissions", "Permissions for " . $this->title, true)) ||
+			(!GroupController::addUserToGroup($group->id(), $user_id)))
 		{
 			return false;
 		}
