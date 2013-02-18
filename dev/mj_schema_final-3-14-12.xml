@@ -1,0 +1,796 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- SQL XML created by WWW SQL Designer, http://code.google.com/p/wwwsqldesigner/ -->
+<!-- Active URL: file:///Users/josh/Downloads/wwwsqldesigner-2.6/index.html -->
+<sql>
+<datatypes db="mysql">
+        <group label="Numeric" color="rgb(238,238,170)">
+            <type label="Integer" length="0" sql="INTEGER" re="INT" quote=""/>
+            <type label="Decimal" length="1" sql="DECIMAL" re="DEC" quote=""/>
+            <type label="Single precision" length="0" sql="FLOAT" quote=""/>
+            <type label="Double precision" length="0" sql="DOUBLE" re="DOUBLE" quote=""/>
+        </group>
+        
+        <group label="Character" color="rgb(255,200,200)">
+            <type label="Char" length="1" sql="CHAR" quote="'"/>
+            <type label="Varchar" length="1" sql="VARCHAR" quote="'"/>
+            <type label="Text" length="0" sql="MEDIUMTEXT" re="TEXT" quote="'"/>
+            <type label="Binary" length="1" sql="BINARY" quote="'"/>
+            <type label="Varbinary" length="1" sql="VARBINARY" quote="'"/>
+            <type label="BLOB" length="0" sql="BLOB" re="BLOB" quote="'"/>
+        </group>
+        
+        <group label="Date &amp; Time" color="rgb(200,255,200)">
+            <type label="Date" length="0" sql="DATE" quote="'"/>
+            <type label="Time" length="0" sql="TIME" quote="'"/>
+            <type label="Datetime" length="0" sql="DATETIME" quote="'"/>
+            <type label="Year" length="0" sql="YEAR" quote=""/>
+            <type label="Timestamp" length="0" sql="TIMESTAMP" quote="'"/>
+        </group>
+        
+        <group label="Miscellaneous" color="rgb(200,200,255)">
+            <type label="ENUM" length="1" sql="ENUM" quote=""/>
+            <type label="SET" length="1" sql="SET" quote=""/>
+            <type label="Bit" length="0" sql="bit" quote=""/>
+        </group>
+    </datatypes><table x="41" y="1098" name="REPO_Colleges">
+<row name="college_id" null="0" autoincrement="1">
+<datatype>INTEGER</datatype>
+</row>
+<row name="name" null="0" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+</row>
+<row name="description" null="1" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+<default>NULL</default></row>
+<row name="owner_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="AUTH_Groups" row="group_id" />
+<comment>User(s) able to make changes</comment>
+</row>
+<key type="PRIMARY" name="">
+<part>college_id</part>
+</key>
+<comment>Designates specific colleges within the University</comment>
+</table>
+<table x="48" y="894" name="REPO_Departments">
+<row name="dept_id" null="0" autoincrement="1">
+<datatype>INTEGER</datatype>
+</row>
+<row name="college_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="REPO_Colleges" row="college_id" />
+<relation table="REPO_Colleges" row="college_id" />
+</row>
+<row name="name" null="0" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+</row>
+<row name="description" null="1" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+<default>NULL</default></row>
+<row name="owner_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="AUTH_Groups" row="group_id" />
+<comment>User(s) able to make changes</comment>
+</row>
+<key type="PRIMARY" name="">
+<part>dept_id</part>
+</key>
+<comment>Specific departments within colleges</comment>
+</table>
+<table x="64" y="623" name="REPO_Classes">
+<row name="class_id" null="0" autoincrement="1">
+<datatype>INTEGER</datatype>
+</row>
+<row name="dept_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="REPO_Departments" row="dept_id" />
+</row>
+<row name="number" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>101</default><comment>Level/number of class, i.e. 101 for ENG101</comment>
+</row>
+<row name="name" null="0" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+</row>
+<row name="description" null="1" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+<default>NULL</default></row>
+<row name="owner_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="AUTH_Groups" row="group_id" />
+<comment>User(s) able to make changes</comment>
+</row>
+<key type="PRIMARY" name="">
+<part>class_id</part>
+</key>
+<comment>Classes taught within departments</comment>
+</table>
+<table x="283" y="455" name="REPO_Sections">
+<row name="section_id" null="0" autoincrement="1">
+<datatype>INTEGER</datatype>
+</row>
+<row name="class_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="REPO_Classes" row="class_id" />
+</row>
+<row name="group_id" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="AUTH_Groups" row="group_id" />
+</row>
+<row name="section_number" null="0" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+<default>'0001'</default><comment>The actual number of the section, i.e. 0001 for NMD101, section 0001</comment>
+</row>
+<row name="day_sched" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="REPO_Day_schedules" row="sched_id" />
+<comment>Days of the week held, pulled from Days table</comment>
+</row>
+<row name="time" null="1" autoincrement="0">
+<datatype>TIME</datatype>
+<default>NULL</default></row>
+<row name="owner_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="AUTH_Groups" row="group_id" />
+<comment>Owner(s) of the section (who is able to make changes)</comment>
+</row>
+<row name="instruct_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="AUTH_Users" row="user_id" />
+<comment>Id of person teaching class</comment>
+</row>
+<row name="semester" null="0" autoincrement="0">
+<datatype>ENUM</datatype>
+<comment>Semester held, pulled from Semesters table</comment>
+</row>
+<row name="year" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+</row>
+<row name="designator" null="0" autoincrement="0">
+<datatype>CHAR(3)</datatype>
+<comment>3-letter designating prefix to the class section (ex: NMD for NMD104)</comment>
+</row>
+<row name="description" null="1" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+<default>NULL</default></row>
+<key type="PRIMARY" name="">
+<part>section_id</part>
+</key>
+<comment>Class sections (aka class instantiations)</comment>
+</table>
+<table x="613" y="428" name="REPO_Day_schedules">
+<row name="sched_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>0</default></row>
+<row name="days_of_week" null="0" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+<comment>CSV of days of the week (in chronological order starting with Sunday) associated with the day_id. i.e. "Monday, Wednesday, Friday"</comment>
+</row>
+<key type="PRIMARY" name="">
+<part>sched_id</part>
+</key>
+<comment>Possible combinations of days of the week classes are held</comment>
+</table>
+<table x="847" y="553" name="REPO_Assignments">
+<row name="assign_id" null="0" autoincrement="1">
+<datatype>INTEGER</datatype>
+<default>0</default></row>
+<row name="section_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="REPO_Sections" row="section_id" />
+</row>
+<row name="creator" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="AUTH_Users" row="user_id" />
+</row>
+<row name="name" null="0" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+</row>
+<row name="description" null="1" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+<default>NULL</default></row>
+<row name="requirements" null="1" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+<default>NULL</default><comment>Formal requirements to fulfill the assignment</comment>
+</row>
+<row name="due_date" null="1" autoincrement="0">
+<datatype>DATE</datatype>
+<default>NULL</default><comment>The date the assignment should be closed for submission</comment>
+</row>
+<row name="portfolio_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="REPO_Portfolios" row="port_id" />
+</row>
+<key type="PRIMARY" name="">
+<part>assign_id</part>
+</key>
+<comment>Assignments created for a project to be done for. (provides context for projects)</comment>
+</table>
+<table x="1422" y="674" name="REPO_Projects">
+<row name="proj_id" null="0" autoincrement="1">
+<datatype>INTEGER</datatype>
+<relation table="REPO_Project_content_map" row="proj_id" />
+</row>
+<row name="creator_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="AUTH_Users" row="user_id" />
+</row>
+<row name="name" null="0" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+</row>
+<row name="abstract" null="1" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+<default>NULL</default></row>
+<row name="description" null="1" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+<default>NULL</default></row>
+<row name="private" null="0" autoincrement="0">
+<datatype>bit(1)</datatype>
+<default>1</default><comment>Whether or not this project is publicly visible (1 = private)</comment>
+</row>
+<row name="type" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="REPO_Project_type" row="type_id" />
+<comment>Type of project the content should be arranged as</comment>
+</row>
+<key type="PRIMARY" name="">
+<part>proj_id</part>
+</key>
+<comment>Unit of work, typically done for an assignment</comment>
+</table>
+<table x="580" y="1061" name="AUTH_Group_user_map">
+<row name="group_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="AUTH_Groups" row="group_id" />
+<relation table="AUTH_Group_user_role_map" row="group_id" />
+</row>
+<row name="user_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="AUTH_Users" row="user_id" />
+<relation table="AUTH_Group_user_role_map" row="user_id" />
+</row>
+<key type="PRIMARY" name="">
+<part>group_id</part>
+<part>user_id</part>
+</key>
+<comment>Mapping of people to groups</comment>
+</table>
+<table x="850" y="1295" name="REPO_Portfolios">
+<row name="port_id" null="0" autoincrement="1">
+<datatype>INTEGER</datatype>
+<relation table="REPO_Portfolio_project_map" row="port_id" />
+</row>
+<row name="owner_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="AUTH_Users" row="user_id" />
+<comment>User(s) able to make changes</comment>
+</row>
+<row name="name" null="0" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+</row>
+<row name="description" null="1" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+<default>NULL</default></row>
+<row name="private" null="0" autoincrement="0">
+<datatype>bit(1)</datatype>
+<default>1</default><comment>Wther or not the protfolio is publicly visible (1 = private)</comment>
+</row>
+<key type="PRIMARY" name="">
+<part>port_id</part>
+</key>
+<comment>Custom collections of works for organizations and users</comment>
+</table>
+<table x="1100" y="613" name="REPO_Portfolio_project_map">
+<row name="port_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+</row>
+<row name="child_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="REPO_Projects" row="proj_id" />
+<relation table="REPO_Portfolios" row="port_id" />
+</row>
+<row name="child_is_portfolio" null="0" autoincrement="0">
+<datatype>bit(1)</datatype>
+<default>0</default></row>
+<key type="PRIMARY" name="">
+<part>port_id</part>
+<part>child_id</part>
+</key>
+<comment>Collections of bodies of work, and how they relate to other portfolios (must be careful not to have circular portfolios)</comment>
+</table>
+<table x="595" y="1234" name="AUTH_Users">
+<row name="user_id" null="0" autoincrement="1">
+<datatype>INTEGER</datatype>
+</row>
+<row name="username" null="0" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+</row>
+<row name="pass" null="0" autoincrement="0">
+<datatype>VARCHAR</datatype>
+</row>
+<row name="first" null="0" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+</row>
+<row name="middle" null="1" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+<default>NULL</default></row>
+<row name="last" null="0" autoincrement="0">
+<datatype>VARCHAR</datatype>
+</row>
+<row name="email" null="1" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+<default>NULL</default></row>
+<row name="email_priv" null="0" autoincrement="0">
+<datatype>bit(1)</datatype>
+<default>0</default><comment>Whether or not the user's e-mail is publicly visible (1 = private)</comment>
+</row>
+<row name="addn_contact" null="1" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+<default>NULL</default></row>
+<row name="bio" null="0" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+</row>
+<row name="user_pic" null="1" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+<default>NULL</default></row>
+<row name="major" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="REPO_Departments" row="dept_id" />
+</row>
+<row name="minor" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="REPO_Departments" row="dept_id" />
+</row>
+<row name="grad_year" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><comment>Year in school (if applicable), i.e. 2nd for a sophomore</comment>
+</row>
+<row name="type_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="AUTH_User_types" row="type_id" />
+<comment>Type of user (ex: udergrad, faculty, staff, admin, etc.)</comment>
+</row>
+<key type="PRIMARY" name="">
+<part>user_id</part>
+</key>
+<comment>All registered users of the system</comment>
+</table>
+<table x="1691" y="866" name="REPO_Project_content_map">
+<row name="proj_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+</row>
+<row name="content_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="REPO_Content" row="content_id" />
+</row>
+<key type="PRIMARY" name="">
+<part>proj_id</part>
+<part>content_id</part>
+</key>
+<comment>Mapping of content to bodies of work</comment>
+</table>
+<table x="1681" y="1044" name="REPO_Content">
+<row name="content_id" null="0" autoincrement="1">
+<datatype>INTEGER</datatype>
+</row>
+<row name="type" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="REPO_Content_types" row="type_id" />
+<comment>Type of media (text, picture, video, etc.)</comment>
+</row>
+<row name="name" null="0" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+</row>
+<row name="description" null="1" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+<default>NULL</default></row>
+<row name="created" null="0" autoincrement="0">
+<datatype>DATETIME</datatype>
+</row>
+<row name="edited" null="1" autoincrement="0">
+<datatype>DATETIME</datatype>
+<default>NULL</default></row>
+<row name="creator_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="AUTH_Users" row="user_id" />
+</row>
+<row name="owner_id" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="AUTH_Groups" row="group_id" />
+<comment>User group with edit permissions</comment>
+</row>
+<row name="filename" null="0" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+<comment>File containing the content of the media object (ex: story.txt/xml, birthday.mov, etc.)</comment>
+</row>
+<key type="PRIMARY" name="">
+<part>content_id</part>
+</key>
+<comment>Unit of content contained within a body of work</comment>
+</table>
+<table x="586" y="740" name="AUTH_Groups">
+<row name="group_id" null="0" autoincrement="1">
+<datatype>INTEGER</datatype>
+</row>
+<row name="name" null="0" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+</row>
+<row name="description" null="1" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+<default>NULL</default></row>
+<row name="private" null="0" autoincrement="0">
+<datatype>bit(1)</datatype>
+<default>1</default><comment>Whether or not the group is globally visible / assignable (1 = private/not global)</comment>
+</row>
+<key type="PRIMARY" name="">
+<part>group_id</part>
+</key>
+<comment>Designation and description of groups</comment>
+</table>
+<table x="1154" y="1333" name="REPO_Portfolio_access_map">
+<row name="port_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="REPO_Portfolios" row="port_id" />
+</row>
+<row name="group_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="AUTH_Groups" row="group_id" />
+</row>
+<row name="access_type" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="REPO_Access_levels" row="access_id" />
+<comment>Access level of group (ex: read, edit, block)</comment>
+</row>
+<key type="PRIMARY" name="">
+<part>port_id</part>
+<part>group_id</part>
+</key>
+<comment>Access mapping of groups to their permissions for specific portfolios.</comment>
+</table>
+<table x="229" y="1251" name="AUTH_Group_user_role_map">
+<row name="group_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+</row>
+<row name="user_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+</row>
+<row name="role_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+</row>
+<key type="PRIMARY" name="">
+<part>group_id</part>
+<part>user_id</part>
+<part>role_id</part>
+</key>
+<comment>Mapping of group users to their specified role(s)</comment>
+</table>
+<table x="54" y="1427" name="AUTH_Roles">
+<row name="role_id" null="0" autoincrement="1">
+<datatype>INTEGER</datatype>
+<relation table="AUTH_Group_user_role_map" row="role_id" />
+</row>
+<row name="name" null="0" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+</row>
+<row name="description" null="1" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+<default>NULL</default></row>
+<key type="PRIMARY" name="">
+<part>role_id</part>
+</key>
+<comment>All different roles a user can have within a group (ex: owner, programmer, designer, etc.)</comment>
+</table>
+<table x="250" y="1561" name="AUTH_User_types">
+<row name="type_id" null="0" autoincrement="1">
+<datatype>INTEGER</datatype>
+</row>
+<row name="name" null="0" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+</row>
+<row name="description" null="1" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+<default>NULL</default></row>
+<key type="PRIMARY" name="">
+<part>type_id</part>
+</key>
+<comment>Types of users in the system (ex: faculty, admin, staff, undergrad, etc.)</comment>
+</table>
+<table x="1026" y="26" name="EVAL_Forms">
+<row name="form_id" null="0" autoincrement="1">
+<datatype>INTEGER</datatype>
+</row>
+<row name="type" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="EVAL_Evaluation_types" row="type_id" />
+</row>
+<row name="name" null="0" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+</row>
+<row name="description" null="1" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+<default>NULL</default></row>
+<row name="creator_user_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="AUTH_Users" row="user_id" />
+</row>
+<row name="private" null="0" autoincrement="0">
+<datatype>bit(1)</datatype>
+<default>1</default><comment>Whether or not this form is publicly visible to form-makers (1 = private)</comment>
+</row>
+<key type="PRIMARY" name="">
+<part>form_id</part>
+</key>
+</table>
+<table x="1635" y="33" name="EVAL_Components">
+<row name="component_id" null="0" autoincrement="1">
+<datatype>INTEGER</datatype>
+<relation table="EVAL_Form_component_map" row="component_id" />
+</row>
+<row name="type" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="EVAL_Component_types" row="type_id" />
+</row>
+<row name="question" null="0" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+</row>
+<row name="options" null="1" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+<default>NULL</default></row>
+<row name="required" null="0" autoincrement="0">
+<datatype>bit(1)</datatype>
+<default>1</default><comment>Whether or not this component is optional (1 = required/not optional)</comment>
+</row>
+<row name="weight" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+</row>
+<row name="category" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="EVAL_Component_categories" row="category_id" />
+</row>
+<row name="private" null="0" autoincrement="0">
+<datatype>bit(1)</datatype>
+<default>0</default><comment>Whether or not the component is publicly available to form-makers (1 = private)</comment>
+</row>
+<row name="creator_user_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="AUTH_Users" row="user_id" />
+</row>
+<key type="PRIMARY" name="">
+<part>component_id</part>
+</key>
+</table>
+<table x="1646" y="280" name="EVAL_Evaluations">
+<row name="evaluation_id" null="1" autoincrement="1">
+<datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="form_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="EVAL_Forms" row="form_id" />
+</row>
+<row name="assigned_by_user_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="AUTH_Users" row="user_id" />
+</row>
+<row name="created" null="0" autoincrement="0">
+<datatype>DATE</datatype>
+</row>
+<row name="due_date" null="1" autoincrement="0">
+<datatype>DATE</datatype>
+<default>NULL</default></row>
+<row name="completed_date" null="1" autoincrement="0">
+<datatype>DATE</datatype>
+<default>NULL</default></row>
+<row name="evaluator_user_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="AUTH_Users" row="user_id" />
+</row>
+<row name="evaluated_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<comment>The id of the object being evaluated, the type of which is specified by the 'type' field of the derived form</comment>
+</row>
+<row name="status" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="EVAL_Statuses" row="status_id" />
+<comment>The status of the evaluation</comment>
+</row>
+<row name="type" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="EVAL_Evaluation_types" row="type_id" />
+</row>
+<key type="PRIMARY" name="">
+<part>evaluation_id</part>
+</key>
+</table>
+<table x="1842" y="196" name="EVAL_Scores">
+<row name="component_id" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="EVAL_Components" row="component_id" />
+</row>
+<row name="evaluation_id" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="EVAL_Evaluations" row="evaluation_id" />
+</row>
+<row name="value" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
+<key type="PRIMARY" name="">
+<part>component_id</part>
+<part>evaluation_id</part>
+</key>
+</table>
+<table x="1318" y="8" name="EVAL_Form_component_map">
+<row name="form_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="EVAL_Forms" row="form_id" />
+</row>
+<row name="component_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+</row>
+<key type="PRIMARY" name="">
+<part>form_id</part>
+<part>component_id</part>
+</key>
+</table>
+<table x="1178" y="1150" name="REPO_Access_levels">
+<row name="access_id" null="0" autoincrement="1">
+<datatype>INTEGER</datatype>
+</row>
+<row name="name" null="0" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+</row>
+<row name="description" null="1" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+<default>NULL</default></row>
+<key type="PRIMARY" name="">
+<part>access_id</part>
+</key>
+<comment>Access levels specified for ownership, editing, reading, etc. rights</comment>
+</table>
+<table x="1245" y="331" name="EVAL_Evaluation_types">
+<row name="type_id" null="0" autoincrement="1">
+<datatype>INTEGER</datatype>
+</row>
+<row name="name" null="0" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+</row>
+<row name="description" null="1" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+<default>NULL</default></row>
+<key type="PRIMARY" name="">
+<part>type_id</part>
+</key>
+<comment>Different types of evaluation targets or objects (user, assignment, project, etc.)</comment>
+</table>
+<table x="1841" y="59" name="EVAL_Component_categories">
+<row name="category_id" null="0" autoincrement="1">
+<datatype>INTEGER</datatype>
+</row>
+<row name="name" null="0" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+</row>
+<row name="description" null="1" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+<default>NULL</default></row>
+<key type="PRIMARY" name="">
+<part>category_id</part>
+</key>
+<comment>Specification of possible categories of components to be grouped together by</comment>
+</table>
+<table x="1863" y="384" name="EVAL_Statuses">
+<row name="status_id" null="0" autoincrement="1">
+<datatype>INTEGER</datatype>
+</row>
+<row name="name" null="0" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+</row>
+<row name="description" null="1" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+<default>NULL</default></row>
+<key type="PRIMARY" name="">
+<part>status_id</part>
+</key>
+<comment>Specification of different statuses of evaluations (ex: partial, complete, pending, archived)</comment>
+</table>
+<table x="1349" y="136" name="EVAL_Component_types">
+<row name="type_id" null="0" autoincrement="1">
+<datatype>INTEGER</datatype>
+</row>
+<row name="name" null="0" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+</row>
+<row name="description" null="1" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+<default>NULL</default></row>
+<key type="PRIMARY" name="">
+<part>type_id</part>
+</key>
+<comment>Specification of different types of components (radio buttons, text, etc.)</comment>
+</table>
+<table x="1876" y="1099" name="REPO_Content_types">
+<row name="type_id" null="0" autoincrement="1">
+<datatype>INTEGER</datatype>
+</row>
+<row name="name" null="0" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+</row>
+<row name="description" null="1" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+<default>NULL</default></row>
+<key type="PRIMARY" name="">
+<part>type_id</part>
+</key>
+<comment>Specification of types of content in the system (video, text, picture, pdf, etc.)</comment>
+</table>
+<table x="1685" y="670" name="REPO_Project_type">
+<row name="type_id" null="0" autoincrement="1">
+<datatype>INTEGER</datatype>
+</row>
+<row name="name" null="0" autoincrement="0">
+<datatype>VARCHAR(255)</datatype>
+</row>
+<row name="description" null="1" autoincrement="0">
+<datatype>VARCHAR(MAX)</datatype>
+<default>NULL</default></row>
+<key type="PRIMARY" name="">
+<part>type_id</part>
+</key>
+<comment>Specification of types of content (ex: gallery, article, etc.)</comment>
+</table>
+<table x="1009" y="930" name="REPO_Assignment_access_map">
+<row name="assign_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="REPO_Assignments" row="assign_id" />
+</row>
+<row name="group_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="AUTH_Groups" row="group_id" />
+</row>
+<row name="access_type" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="REPO_Access_levels" row="access_id" />
+</row>
+<key type="PRIMARY" name="">
+<part>assign_id</part>
+<part>group_id</part>
+</key>
+<comment>Mapping of access levels to specific assignments</comment>
+</table>
+<table x="1350" y="928" name="REPO_Project_access_map">
+<row name="proj_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="REPO_Projects" row="proj_id" />
+</row>
+<row name="group_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="AUTH_Groups" row="group_id" />
+</row>
+<row name="access_type" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="REPO_Access_levels" row="access_id" />
+</row>
+<key type="PRIMARY" name="">
+<part>proj_id</part>
+<part>group_id</part>
+</key>
+<comment>Mapping of access types to projects for users and groups</comment>
+</table>
+<table x="1614" y="1330" name="REPO_Content_access_map">
+<row name="content_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="REPO_Content" row="content_id" />
+</row>
+<row name="group_id" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="AUTH_Groups" row="group_id" />
+</row>
+<row name="access_type" null="0" autoincrement="0">
+<datatype>INTEGER</datatype>
+<relation table="REPO_Access_levels" row="access_id" />
+</row>
+<key type="PRIMARY" name="">
+<part>content_id</part>
+<part>group_id</part>
+</key>
+<comment>Mapping of access levels to content for users and groups</comment>
+</table>
+</sql>
