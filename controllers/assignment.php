@@ -78,7 +78,7 @@ class AssignmentController
 
 	/**
 	 * Gets a specified Assignment object, first checking if the logged-in user has the proper permissions to do so.
-	 *		@param int $id is the ID of the assignment
+	 *	@param int $id is the ID of the assignment
 	 *
 	 *	@return the Assignment object if found, false if the user could not see it or it did not exist
 	 */

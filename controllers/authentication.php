@@ -138,7 +138,7 @@ class AuthenticationController
 	 *	Hashing will fail if the password is longer than 72 characters (to prevent DDOS) or if the resulting
 	 *	hash is less than 20 characters long (which means something went wrong while creating the hash)
 	 *
-	 *		@param string $password The plaintext password to hash.
+	 *	@param string $password The plaintext password to hash.
 	 *	@return The hashed password, or false if hashing failed.
 	 */
 	static function create_hash($password)

@@ -93,7 +93,7 @@ class GroupController
 
 	/**
 	 * Gets a Group object with the specified ID.
-	 *		@param int id is the ID of the group to look for
+	 *	@param int id is the ID of the group to look for
 	 *
 	 *	@return the Group object if one was found, otherwise false
 	 */
